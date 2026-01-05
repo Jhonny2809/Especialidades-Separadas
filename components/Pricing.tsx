@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useContent } from '../contexts/ContentContext';
 import { GlowButton } from './ui/GlowButton';
@@ -28,8 +27,8 @@ export const Pricing: React.FC = () => {
             
             <div className="p-8 md:p-10 text-center border-b border-slate-100 bg-slate-50/50">
                 <div className="flex justify-center mb-6">
-                    <span className="bg-blue-600 text-white text-[10px] md:text-[11px] font-black px-5 py-1.5 rounded-full shadow-lg flex items-center gap-2 uppercase tracking-widest">
-                        <Zap size={14} fill="currentColor" /> PAGUE 4 E LEVE 6
+                    <span className="bg-blue-700 text-white text-[12px] md:text-[14px] font-black px-6 py-2.5 rounded-full shadow-xl flex items-center gap-2 uppercase tracking-widest animate-pulse border-2 border-white/20">
+                        <Zap size={18} fill="currentColor" /> PAGUE 3 E LEVE 6
                     </span>
                 </div>
                 <h3 className="text-3xl md:text-4xl font-black text-slate-900 mb-2 leading-tight">O PACOTE COMPLETO</h3>

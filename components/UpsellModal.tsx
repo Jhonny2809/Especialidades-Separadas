@@ -49,7 +49,7 @@ export const UpsellModal: React.FC<UpsellModalProps> = ({ isOpen, onClose, origi
   };
 
   const individualTotal = (17.90 * 6).toFixed(2).replace('.', ',');
-  const upsellPrice = 54.90;
+  const upsellPrice = 44.90;
   const pricePerSpecialty = (upsellPrice / 71).toFixed(2).replace('.', ',');
   const bonusItems = content.pricing.bonusItems || [];
 
@@ -108,7 +108,7 @@ export const UpsellModal: React.FC<UpsellModalProps> = ({ isOpen, onClose, origi
                     </div>
                     <div className="flex justify-between items-center text-lg md:text-2xl font-black text-emerald-600">
                         <span className="flex items-center gap-2"><TrendingDown size={20} /> Oferta Agora:</span>
-                        <span>R$ 54,90</span>
+                        <span>R$ 44,90</span>
                     </div>
                     <div className="pt-2.5 border-t border-slate-200 flex items-center gap-2 text-blue-600 font-black text-[9px] md:text-[11px] uppercase tracking-wider">
                         <AlertCircle size={14} />
