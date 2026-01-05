@@ -22,7 +22,7 @@ export const CLASSES_DATA: SpecialtyClass[] = [
       "Felinos", "Jardinagem e Horticultura", "Mamíferos", "Modelagem e Fabricação de Sabão",
       "Natação Principiante I", "Pioneiros Adventistas", "Segurança Básica na Água", "Sementes"
     ],
-    price: "17,90",
+    price: "14,90",
     checkoutUrl: "https://pay.cakto.com.br/3f8d7p8_708756" 
   },
   {
@@ -36,7 +36,7 @@ export const CLASSES_DATA: SpecialtyClass[] = [
       "Arbustos", "Árvores", "Aves", "Aves Domésticas",
       "Excursionismo Pedestre com Mochila", "Moluscos", "Pecuária"
     ],
-    price: "17,90",
+    price: "14,90",
     checkoutUrl: "https://pay.cakto.com.br/7m9zoq4_708863"
   },
   {
@@ -50,7 +50,7 @@ export const CLASSES_DATA: SpecialtyClass[] = [
       "Climatologia", "Código Morse", "Flores", "Mapa e Bússola",
       "Primeiros Socorros Básico", "Rastreio de Animais", "Vida Familiar"
     ],
-    price: "17,90",
+    price: "14,90",
     checkoutUrl: "https://pay.cakto.com.br/qpzwec8_709069"
   },
   {
@@ -64,7 +64,7 @@ export const CLASSES_DATA: SpecialtyClass[] = [
       "Floricultura", "Fogueiras e Cozinha ao Ar Livre", "Mapa e Bússola", "Marcação Bíblica",
       "Produção de Vídeo", "Resgate Básico", "Samambaias"
     ],
-    price: "17,90",
+    price: "14,90",
     checkoutUrl: "https://pay.cakto.com.br/374hi3v_709073"
   },
   {
@@ -77,7 +77,7 @@ export const CLASSES_DATA: SpecialtyClass[] = [
       "Fantoche", "Nutrição", "Bactérias", "Floricultura",
       "Orçamento Familiar", "Ordem Unida", "Pioneirias", "Testemunho Juvenil", "Vida Silvestre"
     ],
-    price: "17,90",
+    price: "14,90",
     checkoutUrl: "https://pay.cakto.com.br/om88uev_709074"
   },
   {
@@ -92,7 +92,7 @@ export const CLASSES_DATA: SpecialtyClass[] = [
       "Futsal", "Higiene Oral", "Internet", "Jardinagem e Horticultura",
       "Liderança Campestre", "Plantas Silvestres Comestíveis", "Comidas Típicas do Brasil e América do Sul", "Mordomia Cristã"
     ],
-    price: "17,90",
+    price: "14,90",
     checkoutUrl: "https://pay.cakto.com.br/3dhdvxk_709075"
   },
 ];
@@ -217,11 +217,11 @@ export const CARD_LIST_OFFER = [
 
 export const PRICING_CONTENT: PricingState = {
   title: "Aproveite a Oferta Especial",
-  subtitle: "Pague 3 e leve 6 por apenas 64,90",
+  subtitle: "Pague 3 e leve 6 por apenas 44,90",
   cardTitle: "Material Completo",
   cardSubtitle: "Tudo o que você precisa para aplicar as especialidades",
   originalPrice: "147,00",
-  currentPrice: "64,90",
+  currentPrice: "44,90",
   discountLabel: "OFERTA",
   paymentLabel: "Pagamento Único",
   offerItems: OFFER_ITEMS,

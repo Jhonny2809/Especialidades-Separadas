@@ -8,7 +8,7 @@ export const Pricing: React.FC = () => {
   const { pricing, classes } = content;
 
   // Cálculos para gatilhos mentais
-  const individualPrice = 17.90;
+  const individualPrice = 14.90;
   const classesCount = classes.length;
   const totalIndividual = (individualPrice * classesCount).toFixed(2).replace('.', ',');
   const packPrice = parseFloat(pricing.currentPrice.replace(',', '.'));
@@ -38,7 +38,7 @@ export const Pricing: React.FC = () => {
                 <div className="mb-6 md:mb-8 p-4 rounded-3xl bg-amber-50 border border-amber-100 inline-block w-full max-w-sm">
                    <div className="flex flex-col gap-2">
                       <div className="flex justify-between items-center text-xs md:text-sm text-slate-500">
-                         <span>6 Classes Individuais (R$ 17,90 cada):</span>
+                         <span>6 Classes Individuais (R$ 14,90 cada):</span>
                          <span className="font-bold line-through">R$ {totalIndividual}</span>
                       </div>
                       <div className="flex justify-between items-center text-emerald-600 font-black text-xs md:text-sm">
