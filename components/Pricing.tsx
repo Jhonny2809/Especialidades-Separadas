@@ -3,6 +3,13 @@ import { useContent } from '../contexts/ContentContext';
 import { GlowButton } from './ui/GlowButton';
 import { CheckCircle2, ShieldCheck, Zap, AlertCircle, TrendingDown, Gift } from 'lucide-react';
 
+// 1. Declaração para o TypeScript reconhecer o Pixel
+declare global {
+  interface Window {
+    fbq: any;
+  }
+}
+
 export const Pricing: React.FC = () => {
   const { content } = useContent();
   const { pricing, classes } = content;
@@ -15,6 +22,17 @@ export const Pricing: React.FC = () => {
   const totalSpecialties = 71;
   const pricePerSpecialty = (packPrice / totalSpecialties).toFixed(2).replace('.', ',');
   const savings = (parseFloat(totalIndividual.replace(',', '.')) - packPrice).toFixed(2).replace('.', ',');
+
+  // 2. Função para disparar o Pixel com o VALOR CORRETO
+  const handlePurchaseClick = () => {
+    if (typeof window.fbq === 'function') {
+      window.fbq('track', 'InitiateCheckout', {
+        value: packPrice, // Envia o valor dinâmico (ex: 44.90)
+        currency: 'BRL',
+        content_name: 'Pacote Completo 71 Especialidades'
+      });
+    }
+  };
 
   return (
     <section id="oferta" className="pt-4 pb-24 relative overflow-hidden bg-slate-50 flex items-center justify-center">
@@ -92,12 +110,15 @@ export const Pricing: React.FC = () => {
                   </div>
                 )}
 
-                <GlowButton 
-                  text="QUERO O PACOTE COMPLETO" 
-                  fullWidth 
-                  className="py-4 md:py-5 text-base md:text-xl shadow-xl" 
-                  href={content.settings.checkoutUrl} 
-                />
+                {/* 3. Adicionamos o evento onClick wrapper para garantir o disparo */}
+                <div onClick={handlePurchaseClick} className="w-full">
+                    <GlowButton 
+                        text="QUERO O PACOTE COMPLETO" 
+                        fullWidth 
+                        className="py-4 md:py-5 text-base md:text-xl shadow-xl" 
+                        href={content.settings.checkoutUrl} 
+                    />
+                </div>
 
                 <div className="mt-8 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <span className="flex items-center gap-2"><ShieldCheck size={16} className="text-emerald-500"/> 30 dias de garantia</span>
