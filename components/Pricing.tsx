@@ -3,36 +3,18 @@ import { useContent } from '../contexts/ContentContext';
 import { GlowButton } from './ui/GlowButton';
 import { CheckCircle2, ShieldCheck, Zap, AlertCircle, TrendingDown, Gift } from 'lucide-react';
 
-// 1. Declaração para o TypeScript reconhecer o Pixel
-declare global {
-  interface Window {
-    fbq: any;
-  }
-}
-
 export const Pricing: React.FC = () => {
   const { content } = useContent();
   const { pricing, classes } = content;
 
   // Cálculos para gatilhos mentais
-  const individualPrice = 14.90;
+  const individualPrice = 10.90;
   const classesCount = classes.length;
   const totalIndividual = (individualPrice * classesCount).toFixed(2).replace('.', ',');
   const packPrice = parseFloat(pricing.currentPrice.replace(',', '.'));
   const totalSpecialties = 71;
   const pricePerSpecialty = (packPrice / totalSpecialties).toFixed(2).replace('.', ',');
   const savings = (parseFloat(totalIndividual.replace(',', '.')) - packPrice).toFixed(2).replace('.', ',');
-
-  // 2. Função para disparar o Pixel com o VALOR CORRETO
-  const handlePurchaseClick = () => {
-    if (typeof window.fbq === 'function') {
-      window.fbq('track', 'InitiateCheckout', {
-        value: packPrice, // Envia o valor dinâmico (ex: 44.90)
-        currency: 'BRL',
-        content_name: 'Pacote Completo 71 Especialidades'
-      });
-    }
-  };
 
   return (
     <section id="oferta" className="pt-4 pb-24 relative overflow-hidden bg-slate-50 flex items-center justify-center">
@@ -46,7 +28,7 @@ export const Pricing: React.FC = () => {
             <div className="p-8 md:p-10 text-center border-b border-slate-100 bg-slate-50/50">
                 <div className="flex justify-center mb-6">
                     <span className="bg-blue-700 text-white text-[12px] md:text-[14px] font-black px-6 py-2.5 rounded-full shadow-xl flex items-center gap-2 uppercase tracking-widest animate-pulse border-2 border-white/20">
-                        <Zap size={18} fill="currentColor" /> PAGUE 3 E LEVE 6
+                        <Zap size={18} fill="currentColor" /> PAGUE 4 E LEVE 6
                     </span>
                 </div>
                 <h3 className="text-3xl md:text-4xl font-black text-slate-900 mb-2 leading-tight">O PACOTE COMPLETO</h3>
@@ -56,7 +38,7 @@ export const Pricing: React.FC = () => {
                 <div className="mb-6 md:mb-8 p-4 rounded-3xl bg-amber-50 border border-amber-100 inline-block w-full max-w-sm">
                    <div className="flex flex-col gap-2">
                       <div className="flex justify-between items-center text-xs md:text-sm text-slate-500">
-                         <span>6 Classes Individuais (R$ 14,90 cada):</span>
+                         <span>6 Classes Individuais (R$ 10,90 cada):</span>
                          <span className="font-bold line-through">R$ {totalIndividual}</span>
                       </div>
                       <div className="flex justify-between items-center text-emerald-600 font-black text-xs md:text-sm">
@@ -110,15 +92,12 @@ export const Pricing: React.FC = () => {
                   </div>
                 )}
 
-                {/* 3. Adicionamos o evento onClick wrapper para garantir o disparo */}
-                <div onClick={handlePurchaseClick} className="w-full">
-                    <GlowButton 
-                        text="QUERO O PACOTE COMPLETO" 
-                        fullWidth 
-                        className="py-4 md:py-5 text-base md:text-xl shadow-xl" 
-                        href={content.settings.checkoutUrl} 
-                    />
-                </div>
+                <GlowButton 
+                  text="QUERO O PACOTE COMPLETO" 
+                  fullWidth 
+                  className="py-4 md:py-5 text-base md:text-xl shadow-xl" 
+                  href={content.settings.checkoutUrl} 
+                />
 
                 <div className="mt-8 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <span className="flex items-center gap-2"><ShieldCheck size={16} className="text-emerald-500"/> 30 dias de garantia</span>

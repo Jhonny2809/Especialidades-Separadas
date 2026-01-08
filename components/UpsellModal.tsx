@@ -48,7 +48,7 @@ export const UpsellModal: React.FC<UpsellModalProps> = ({ isOpen, onClose, origi
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const individualPriceVal = 14.90;
+  const individualPriceVal = 10.90;
   const individualTotal = (individualPriceVal * 6).toFixed(2).replace('.', ',');
   const upsellPrice = 34.90;
   const pricePerSpecialty = (upsellPrice / 71).toFixed(2).replace('.', ',');
@@ -146,7 +146,7 @@ export const UpsellModal: React.FC<UpsellModalProps> = ({ isOpen, onClose, origi
                         onClick={handleDecline}
                         className="w-full text-slate-400 hover:text-slate-600 font-bold py-2 text-[10px] md:text-sm uppercase tracking-widest flex items-center justify-center gap-1 transition-colors"
                     >
-                        Não, prefiro pagar 14,90 por uma classe <ChevronRight size={12} />
+                        Não, prefiro pagar 10,90 por uma classe <ChevronRight size={12} />
                     </button>
                 </div>
             </div>
