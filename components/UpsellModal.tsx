@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Zap, Clock, TrendingDown, ChevronRight, AlertCircle, ShoppingCart, Gift, Check } from 'lucide-react';
@@ -35,10 +36,12 @@ export const UpsellModal: React.FC<UpsellModalProps> = ({ isOpen, onClose, origi
   }, [isOpen]);
 
   const handleAccept = () => {
+    // Oferta de 34,90
     redirectToCheckout(content.settings.upsellCheckoutUrl);
   };
 
   const handleDecline = () => {
+    // Oferta individual de 10,90
     redirectToCheckout(originalUrl);
   };
 

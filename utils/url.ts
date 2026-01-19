@@ -1,29 +1,40 @@
 
 /**
- * Anexa parâmetros UTM da URL atual ao link de destino de forma robusta.
- * Utiliza a API URL nativa para evitar erros de concatenação de strings.
+ * Captura todos os parâmetros da URL atual (UTMs, etc.) e os mescla na URL de destino.
+ * Esta versão é mais robusta e trata corretamente URLs absolutas e mesclagem de parâmetros existentes.
  */
 export const appendUTMs = (url: string): string => {
-  if (typeof window === 'undefined' || !url || typeof url !== 'string') return url;
+  if (typeof window === 'undefined' || !url) return url;
   
+  const currentSearch = window.location.search;
+  if (!currentSearch || currentSearch === '?') return url;
+
   try {
-    // Criar um objeto URL para manipular os parâmetros de forma segura
-    const targetUrl = new URL(url, window.location.origin);
-    const currentParams = new URLSearchParams(window.location.search);
+    // Tenta tratar como URL absoluta para usar a API nativa
+    const urlObj = new URL(url);
+    const currentParams = new URLSearchParams(currentSearch);
     
-    // Mesclar parâmetros atuais nos parâmetros de destino (preservando os atuais se houver conflito)
+    // Mesclar: Parâmetros da página atual sobrescrevem ou adicionam aos do checkout
     currentParams.forEach((value, key) => {
-      targetUrl.searchParams.set(key, value);
+      urlObj.searchParams.set(key, value);
     });
     
-    return targetUrl.toString();
+    return urlObj.toString();
   } catch (e) {
-    // Fallback caso a URL seja inválida ou um path relativo
-    const search = window.location.search;
-    if (!search || search === '?') return url;
-    const cleanSearch = search.startsWith('?') ? search.substring(1) : search;
-    const separator = url.includes('?') ? '&' : '?';
-    return `${url}${separator}${cleanSearch}`;
+    // Fallback robusto para strings de URL que podem falhar no construtor (ex: paths relativos)
+    const baseUrl = url.split('#')[0];
+    const anchor = url.includes('#') ? '#' + url.split('#')[1] : '';
+    const [path, existingSearch] = baseUrl.split('?');
+    
+    const targetParams = new URLSearchParams(existingSearch || '');
+    const currentParams = new URLSearchParams(currentSearch);
+    
+    currentParams.forEach((value, key) => {
+      targetParams.set(key, value);
+    });
+    
+    const finalSearch = targetParams.toString();
+    return `${path}${finalSearch ? '?' + finalSearch : ''}${anchor}`;
   }
 };
 
@@ -35,6 +46,9 @@ export const redirectToCheckout = (url: string) => {
   
   const finalUrl = appendUTMs(url);
   
+  // Log para depuração (útil para verificar no console se as UTMs estão indo)
+  console.log(`[Redirect] Direcionando para: ${finalUrl}`);
+  
   // Disparar evento do Facebook Pixel se disponível
   try {
     const fbPixel = (window as any).fbq;
@@ -45,12 +59,9 @@ export const redirectToCheckout = (url: string) => {
       });
     }
   } catch (e) {
-    console.warn("Erro ao disparar evento do Facebook Pixel:", e);
+    console.warn("Erro ao disparar evento de rastreio:", e);
   }
 
-  // Tracking do Utmify (se configurado para escutar redirecionamentos manuais)
-  // O script do Utmify geralmente injeta parâmetros automaticamente, 
-  // mas o redirecionamento via window.location é a forma mais segura.
-  
+  // Redirecionamento direto
   window.location.href = finalUrl;
 };
