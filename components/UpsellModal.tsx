@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Zap, Clock, TrendingDown, ChevronRight, AlertCircle, ShoppingCart, Gift, Check } from 'lucide-react';
@@ -36,7 +35,7 @@ export const UpsellModal: React.FC<UpsellModalProps> = ({ isOpen, onClose, origi
   }, [isOpen]);
 
   const handleAccept = () => {
-    // Oferta de 34,90
+    // Oferta de 24,90
     redirectToCheckout(content.settings.upsellCheckoutUrl);
   };
 
@@ -53,7 +52,7 @@ export const UpsellModal: React.FC<UpsellModalProps> = ({ isOpen, onClose, origi
 
   const individualPriceVal = 10.90;
   const individualTotal = (individualPriceVal * 6).toFixed(2).replace('.', ',');
-  const upsellPrice = 34.90;
+  const upsellPrice = 24.90;
   const pricePerSpecialty = (upsellPrice / 71).toFixed(2).replace('.', ',');
   const bonusItems = content.pricing.bonusItems || [];
 
@@ -112,7 +111,7 @@ export const UpsellModal: React.FC<UpsellModalProps> = ({ isOpen, onClose, origi
                     </div>
                     <div className="flex justify-between items-center text-lg md:text-2xl font-black text-emerald-600">
                         <span className="flex items-center gap-2"><TrendingDown size={20} /> Oferta Agora:</span>
-                        <span>R$ 34,90</span>
+                        <span>R$ 24,90</span>
                     </div>
                     <div className="pt-2.5 border-t border-slate-200 flex items-center gap-2 text-blue-600 font-black text-[9px] md:text-[11px] uppercase tracking-wider">
                         <AlertCircle size={14} />

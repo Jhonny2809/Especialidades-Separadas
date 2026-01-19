@@ -217,11 +217,11 @@ export const CARD_LIST_OFFER = [
 
 export const PRICING_CONTENT: PricingState = {
   title: "Aproveite a Oferta Especial",
-  subtitle: "Pague 4 e leve 6 por apenas 44,90",
+  subtitle: "Pague 4 e leve 6 por apenas 34,90",
   cardTitle: "Material Completo",
   cardSubtitle: "Tudo o que você precisa para aplicar as especialidades",
   originalPrice: "147,00",
-  currentPrice: "44,90",
+  currentPrice: "34,90",
   discountLabel: "OFERTA",
   paymentLabel: "Pagamento Único",
   offerItems: OFFER_ITEMS,
