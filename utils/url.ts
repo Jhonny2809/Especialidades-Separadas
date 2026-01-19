@@ -1,29 +1,30 @@
 
 /**
  * Captura todos os parâmetros da URL atual (UTMs, etc.) e os mescla na URL de destino.
- * Esta versão é mais robusta e trata corretamente URLs absolutas e mesclagem de parâmetros existentes.
+ * Esta versão utiliza a API URLSearchParams para garantir que os caracteres sejam
+ * codificados corretamente e que nenhum parâmetro seja perdido.
  */
 export const appendUTMs = (url: string): string => {
   if (typeof window === 'undefined' || !url) return url;
   
   const currentSearch = window.location.search;
+  // Se não houver parâmetros na URL atual, retorna a URL original
   if (!currentSearch || currentSearch === '?') return url;
 
   try {
-    // Tenta tratar como URL absoluta para usar a API nativa
+    // Tratamento para URLs absolutas
     const urlObj = new URL(url);
     const currentParams = new URLSearchParams(currentSearch);
     
-    // Mesclar: Parâmetros da página atual sobrescrevem ou adicionam aos do checkout
+    // Mescla os parâmetros: parâmetros da página atual têm prioridade ou são adicionados
     currentParams.forEach((value, key) => {
       urlObj.searchParams.set(key, value);
     });
     
     return urlObj.toString();
   } catch (e) {
-    // Fallback robusto para strings de URL que podem falhar no construtor (ex: paths relativos)
-    const baseUrl = url.split('#')[0];
-    const anchor = url.includes('#') ? '#' + url.split('#')[1] : '';
+    // Fallback para URLs relativas ou strings de URL complexas
+    const [baseUrl, anchor] = url.split('#');
     const [path, existingSearch] = baseUrl.split('?');
     
     const targetParams = new URLSearchParams(existingSearch || '');
@@ -34,34 +35,33 @@ export const appendUTMs = (url: string): string => {
     });
     
     const finalSearch = targetParams.toString();
-    return `${path}${finalSearch ? '?' + finalSearch : ''}${anchor}`;
+    const finalAnchor = anchor ? `#${anchor}` : '';
+    
+    return `${path}${finalSearch ? '?' + finalSearch : ''}${finalAnchor}`;
   }
 };
 
 /**
- * Realiza o redirecionamento seguro para o checkout preservando UTMs e disparando eventos de pixel.
+ * Realiza o redirecionamento para o checkout garantindo a passagem de UTMs
+ * e disparando eventos de rastreamento para o Facebook Pixel (se configurado).
  */
 export const redirectToCheckout = (url: string) => {
-  if (!url || typeof url !== 'string') return;
+  if (!url) return;
   
   const finalUrl = appendUTMs(url);
   
-  // Log para depuração (útil para verificar no console se as UTMs estão indo)
-  console.log(`[Redirect] Direcionando para: ${finalUrl}`);
+  // Feedback visual no console para facilitar auditoria de tráfego
+  console.log(`[UTM-TRACKING] Redirecionando com parâmetros: ${finalUrl}`);
   
-  // Disparar evento do Facebook Pixel se disponível
+  // Disparo de evento de InitiateCheckout para o Pixel
   try {
-    const fbPixel = (window as any).fbq;
-    if (typeof fbPixel === 'function') {
-      fbPixel('track', 'InitiateCheckout', {
-        content_name: 'Especialidades Premium',
-        currency: 'BRL'
-      });
+    if ((window as any).fbq) {
+      (window as any).fbq('track', 'InitiateCheckout');
     }
-  } catch (e) {
-    console.warn("Erro ao disparar evento de rastreio:", e);
+  } catch (err) {
+    console.warn("Falha ao registrar evento no Pixel:", err);
   }
 
-  // Redirecionamento direto
+  // Redirecionamento de navegador
   window.location.href = finalUrl;
 };

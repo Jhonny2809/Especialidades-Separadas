@@ -1,12 +1,16 @@
 
 import React from 'react';
-import { Shield, Lock, CreditCard, RefreshCcw } from 'lucide-react';
+import { Shield, Lock, CreditCard, RefreshCcw, ArrowUp } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
 import { GlowButton } from './ui/GlowButton';
 
 export const Footer: React.FC = () => {
   const { content } = useContent();
   const { footer } = content;
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <>
@@ -19,6 +23,14 @@ export const Footer: React.FC = () => {
           <p className="text-slate-500 mb-10 text-xl font-medium leading-relaxed">
             {footer.guaranteeText}
           </p>
+          
+          <div className="mb-12">
+            <GlowButton 
+              text={footer.finalCtaButton || "Garanta seu Material"} 
+              className="mx-auto max-w-md py-5 text-xl"
+            />
+          </div>
+
           <div className="flex flex-wrap justify-center gap-8 text-sm font-black text-slate-400 uppercase tracking-widest">
              <span className="flex items-center gap-2"><Lock size={16}/> Compra Segura</span>
              <span className="flex items-center gap-2"><RefreshCcw size={16}/> Satisfação Garantida</span>
@@ -31,6 +43,13 @@ export const Footer: React.FC = () => {
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         
         <div className="container mx-auto px-4 relative z-10">
+          <button 
+            onClick={scrollToTop}
+            className="mb-12 p-4 bg-white/5 border border-white/10 rounded-full text-white hover:bg-white/10 transition-all group"
+          >
+            <ArrowUp className="group-hover:-translate-y-1 transition-transform" />
+          </button>
+
           <div className="pt-8 border-t border-white/10 text-slate-500 text-sm font-bold uppercase tracking-widest flex flex-col items-center gap-4">
              <p>© 2025 Especialidades Premium. Todos os direitos reservados.</p>
              <div className="flex gap-6">
