@@ -240,8 +240,8 @@ export const FOOTER_CONTENT: FooterState = {
 export const DEFAULT_SETTINGS: GlobalSettings = {
   pixelCode: "",
   enableAnimations: true,
-  checkoutUrl: "https://pay.cakto.com.br/btxj763_", 
-  upsellCheckoutUrl: "https://pay.cakto.com.br/3fmwdnu",
+  checkoutUrl: "https://pay.cakto.com.br/3afabcp", 
+  upsellCheckoutUrl: "https://pay.cakto.com.br/rv2cvjj",
   marqueeSpeed: 120,
   testimonialSpeed: 90
 };
