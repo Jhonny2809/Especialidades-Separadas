@@ -5,7 +5,7 @@ import { useContent } from '../../contexts/ContentContext';
 import { 
   X, Save, LayoutTemplate, Layers, Image as ImageIcon, Star, 
   CreditCard, ShieldCheck, Type, Code, ChevronRight,
-  Plus, Trash2, Check, Link as LinkIcon, AlertTriangle, Gauge
+  Plus, Trash2, Check, Link as LinkIcon, AlertTriangle
 } from 'lucide-react';
 
 export const AdminStyles: React.FC = () => (
@@ -125,14 +125,11 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
 
-  /**
-   * Atualiza o estado local de forma segura, garantindo que objetos complexos
-   * (Eventos, Elementos DOM) não entrem na árvore de dados.
-   */
   const handleLocalChange = useCallback((section: string, key: string, value: any) => {
-    // Filtro defensivo: se o valor parecer ser um objeto de sistema, abortar.
+    // Robust check for DOM elements or events slipping into state
     if (value && typeof value === 'object') {
-        if (value.nativeEvent || value.target || value.currentTarget || value instanceof HTMLElement) {
+        if (value.nativeEvent || value.target || value instanceof HTMLElement || value.preventDefault) {
+            console.error("Attempted to set DOM element/Event into state:", value);
             return;
         }
     }
@@ -147,7 +144,6 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
   }, []);
 
   const handleSave = useCallback((e?: React.MouseEvent) => {
-    // Consome o evento imediatamente para evitar que ele suba ou cause loops
     if (e && typeof e.preventDefault === 'function') {
         e.preventDefault();
         e.stopPropagation();
@@ -155,22 +151,22 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
 
     setIsSaving(true);
     
-    // Pequeno delay para feedback visual e garantir que o processamento do evento terminou
     setTimeout(() => {
         try {
-            // safeClone garante a limpeza final antes de salvar
-            const cleanData = safeClone(localContent);
+            // Force a clean clone to detect circular references early
+            const cleanData = JSON.parse(JSON.stringify(localContent));
             updateContent(cleanData);
             
             setIsSaving(false);
             setShowSaveSuccess(true);
             setTimeout(() => setShowSaveSuccess(false), 2000);
         } catch (err) {
+            console.error("Save failed:", err);
             setIsSaving(false);
-            alert("Não foi possível salvar os dados. Verifique o console.");
+            alert("Erro ao salvar: Dados corrompidos (referência circular). Recarregue a página e tente novamente.");
         }
     }, 200);
-  }, [localContent, updateContent, safeClone]);
+  }, [localContent, updateContent]);
 
   const renderSidebarItem = (id: TabType, label: string, icon: React.ReactNode) => (
     <button
@@ -298,9 +294,12 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                                       <input 
                                         value={cls.name}
                                         onChange={(e) => {
-                                            const newClasses = [...localContent.classes];
-                                            newClasses[idx] = { ...newClasses[idx], name: e.target.value };
-                                            setLocalContent({...localContent, classes: newClasses});
+                                            const val = e.target.value;
+                                            setLocalContent((prev: any) => {
+                                                const newClasses = [...prev.classes];
+                                                newClasses[idx] = { ...newClasses[idx], name: val };
+                                                return { ...prev, classes: newClasses };
+                                            });
                                         }}
                                         className="input-field"
                                       />
@@ -311,9 +310,11 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                                         value={cls.count}
                                         onChange={(e) => {
                                             const val = parseInt(e.target.value);
-                                            const newClasses = [...localContent.classes];
-                                            newClasses[idx] = { ...newClasses[idx], count: isNaN(val) ? 0 : val };
-                                            setLocalContent({...localContent, classes: newClasses});
+                                            setLocalContent((prev: any) => {
+                                                const newClasses = [...prev.classes];
+                                                newClasses[idx] = { ...newClasses[idx], count: isNaN(val) ? 0 : val };
+                                                return { ...prev, classes: newClasses };
+                                            });
                                         }}
                                         className="input-field"
                                       />
@@ -323,10 +324,12 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                               <textarea 
                                   value={cls.items.join('\n')}
                                   onChange={(e) => {
-                                      const newItems = e.target.value.split('\n').filter((line: string) => line.trim() !== '');
-                                      const newClasses = [...localContent.classes];
-                                      newClasses[idx] = { ...newClasses[idx], items: newItems };
-                                      setLocalContent({...localContent, classes: newClasses});
+                                      const items = e.target.value.split('\n').filter((line: string) => line.trim() !== '');
+                                      setLocalContent((prev: any) => {
+                                          const newClasses = [...prev.classes];
+                                          newClasses[idx] = { ...newClasses[idx], items };
+                                          return { ...prev, classes: newClasses };
+                                      });
                                   }}
                                   className="input-field min-h-[200px]"
                               />
@@ -341,8 +344,10 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                          <button 
                             onClick={(e) => {
                                 e.preventDefault();
-                                const newSamples = [...localContent.samples, { title: "Nova Amostra", image: "https://via.placeholder.com/400x300" }];
-                                setLocalContent({...localContent, samples: newSamples});
+                                setLocalContent((prev: any) => ({
+                                    ...prev,
+                                    samples: [...prev.samples, { title: "Nova Amostra", image: "https://via.placeholder.com/400x300" }]
+                                }));
                             }}
                             className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300"
                          >
@@ -355,8 +360,10 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                                   <button 
                                       onClick={(e) => {
                                           e.preventDefault();
-                                          const newSamples = localContent.samples.filter((_: any, i: number) => i !== idx);
-                                          setLocalContent({...localContent, samples: newSamples});
+                                          setLocalContent((prev: any) => ({
+                                              ...prev,
+                                              samples: prev.samples.filter((_: any, i: number) => i !== idx)
+                                          }));
                                       }}
                                       className="absolute top-2 right-2 text-slate-600 hover:text-red-400 p-1 z-10 bg-slate-900/80 rounded-full"
                                   >
@@ -367,9 +374,11 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                                         label="Link da Imagem"
                                         value={sample.image}
                                         onChange={(url) => {
-                                            const newSamples = [...localContent.samples];
-                                            newSamples[idx] = { ...newSamples[idx], image: url };
-                                            setLocalContent({...localContent, samples: newSamples});
+                                            setLocalContent((prev: any) => {
+                                                const newSamples = [...prev.samples];
+                                                newSamples[idx] = { ...newSamples[idx], image: url };
+                                                return { ...prev, samples: newSamples };
+                                            });
                                         }}
                                     />
                                   </div>
@@ -377,9 +386,12 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                                       <input 
                                         value={sample.title}
                                         onChange={(e) => {
-                                            const newSamples = [...localContent.samples];
-                                            newSamples[idx] = { ...newSamples[idx], title: e.target.value };
-                                            setLocalContent({...localContent, samples: newSamples});
+                                            const val = e.target.value;
+                                            setLocalContent((prev: any) => {
+                                                const newSamples = [...prev.samples];
+                                                newSamples[idx] = { ...newSamples[idx], title: val };
+                                                return { ...prev, samples: newSamples };
+                                            });
                                         }}
                                         className="input-field"
                                       />
@@ -402,9 +414,12 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                                        <input 
                                             value={feature.title}
                                             onChange={(e) => {
-                                                const newFeatures = [...localContent.features];
-                                                newFeatures[idx] = { ...newFeatures[idx], title: e.target.value };
-                                                setLocalContent({...localContent, features: newFeatures});
+                                                const val = e.target.value;
+                                                setLocalContent((prev: any) => {
+                                                    const newFeatures = [...prev.features];
+                                                    newFeatures[idx] = { ...newFeatures[idx], title: val };
+                                                    return { ...prev, features: newFeatures };
+                                                });
                                             }}
                                             className="input-field font-bold" 
                                         />
@@ -413,9 +428,12 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                                        <textarea 
                                             value={feature.description}
                                             onChange={(e) => {
-                                                const newFeatures = [...localContent.features];
-                                                newFeatures[idx] = { ...newFeatures[idx], description: e.target.value };
-                                                setLocalContent({...localContent, features: newFeatures});
+                                                const val = e.target.value;
+                                                setLocalContent((prev: any) => {
+                                                    const newFeatures = [...prev.features];
+                                                    newFeatures[idx] = { ...newFeatures[idx], description: val };
+                                                    return { ...prev, features: newFeatures };
+                                                });
                                             }}
                                             className="input-field min-h-[80px]" 
                                         />
@@ -432,8 +450,10 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                          <button 
                             onClick={(e) => {
                                 e.preventDefault();
-                                const newT = [...localContent.testimonials, { name: "Novo Usuário", role: "Instrutor", text: "...", avatarColor: "bg-blue-500" }];
-                                setLocalContent({...localContent, testimonials: newT});
+                                setLocalContent((prev: any) => ({
+                                    ...prev,
+                                    testimonials: [...prev.testimonials, { name: "Novo Usuário", role: "Instrutor", text: "...", avatarColor: "bg-blue-500" }]
+                                }));
                             }}
                             className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300"
                          >
@@ -446,8 +466,10 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                                 <button 
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        const newT = localContent.testimonials.filter((_: any, i: number) => i !== idx);
-                                        setLocalContent({...localContent, testimonials: newT});
+                                        setLocalContent((prev: any) => ({
+                                            ...prev,
+                                            testimonials: prev.testimonials.filter((_: any, i: number) => i !== idx)
+                                        }));
                                     }}
                                     className="absolute top-2 right-2 text-slate-600 hover:text-red-400 p-1"
                                 >
@@ -458,9 +480,12 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                                         <input 
                                             value={t.name}
                                             onChange={(e) => {
-                                                const newT = [...localContent.testimonials];
-                                                newT[idx] = { ...newT[idx], name: e.target.value };
-                                                setLocalContent({...localContent, testimonials: newT});
+                                                const val = e.target.value;
+                                                setLocalContent((prev: any) => {
+                                                    const newT = [...prev.testimonials];
+                                                    newT[idx] = { ...newT[idx], name: val };
+                                                    return { ...prev, testimonials: newT };
+                                                });
                                             }}
                                             className="input-field"
                                         />
@@ -469,9 +494,12 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                                         <input 
                                             value={t.role}
                                             onChange={(e) => {
-                                                const newT = [...localContent.testimonials];
-                                                newT[idx] = { ...newT[idx], role: e.target.value };
-                                                setLocalContent({...localContent, testimonials: newT});
+                                                const val = e.target.value;
+                                                setLocalContent((prev: any) => {
+                                                    const newT = [...prev.testimonials];
+                                                    newT[idx] = { ...newT[idx], role: val };
+                                                    return { ...prev, testimonials: newT };
+                                                });
                                             }}
                                             className="input-field"
                                         />
@@ -480,18 +508,23 @@ export const AdminDashboard: React.FC<DashboardProps> = ({ onClose }) => {
                                         label="Foto de Perfil"
                                         value={t.image}
                                         onChange={(url) => {
-                                            const newT = [...localContent.testimonials];
-                                            newT[idx] = { ...newT[idx], image: url };
-                                            setLocalContent({...localContent, testimonials: newT});
+                                            setLocalContent((prev: any) => {
+                                                const newT = [...prev.testimonials];
+                                                newT[idx] = { ...newT[idx], image: url };
+                                                return { ...prev, testimonials: newT };
+                                            });
                                         }}
                                     />
                                     <InputGroup label="Depoimento">
                                         <textarea 
                                             value={t.text}
                                             onChange={(e) => {
-                                                const newT = [...localContent.testimonials];
-                                                newT[idx] = { ...newT[idx], text: e.target.value };
-                                                setLocalContent({...localContent, testimonials: newT});
+                                                const val = e.target.value;
+                                                setLocalContent((prev: any) => {
+                                                    const newT = [...prev.testimonials];
+                                                    newT[idx] = { ...newT[idx], text: val };
+                                                    return { ...prev, testimonials: newT };
+                                                });
                                             }}
                                             className="input-field min-h-[100px] text-sm"
                                         />
